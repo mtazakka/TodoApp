@@ -59,7 +59,7 @@ export default function TodoAdd({ navigation }) {
                     <>
                         <View style={styles.header}>
                             <View style={styles.iconContainer}>
-                                <MaterialIcons name="arrow-back" size={35} color={COLORS.white} onPress={() => navigation.navigate('TodoApp', { data: todos })} />
+                                <MaterialIcons name="arrow-back" size={35} color={COLORS.white} onPress={() => navigation.navigate('TodoApp')} />
                             </View>
                             <Text style={{ fontWeight: 'bold', fontSize: 20, color: COLORS.primary }}>
                                 Add Todo

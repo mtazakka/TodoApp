@@ -13,7 +13,6 @@ export function Navigation() {
             <Stack.Screen name="Air Quality Index" component={AqiScreen} />
             <Stack.Screen name="TodoAdd" component={TodoAdd} options={{ headerShown: false }} />
         </Stack.Navigator>
-
     );
 }
 
