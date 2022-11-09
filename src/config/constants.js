@@ -1,5 +1,0 @@
-export const READ_TODO = 'todo/read_todo'
-export const CREATE_TODO = 'todo/create_todo'
-export const UPDATE_TODO = 'todo/update_todo'
-export const REMOVE_TODO = 'todo/remove_todo'
-export const RESEND_TODO = 'todo/resend_todo'
