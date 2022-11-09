@@ -1,70 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Button, FlatList, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { ActivityIndicator, Alert, Button, SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import COLORS from '../config/COLORS'
-
+import { addTodo } from '../features/todo/todoSlice'
+import { useDispatch } from 'react-redux'
 
 export default function TodoAdd({ navigation }) {
-    const [todos, setTodos] = useState([])
+    const [isLoading, setIsLoading] = useState(false)
     const [textInput, setTextInput] = useState('')
     const [descriptionInput, setDescriptionInput] = useState('')
-    const [isLoading, setIsLoading] = useState(false)
+    const dispatch = useDispatch()
 
-    useEffect(() => {
-        getTodosFromDevice()
-    }, [])
-
-    const startLoading = () => {
-        setIsLoading(true);
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 2000);
-        setTimeout(() => {
-            addTodo()
-        }, 2000)
-
-    };
-
-    const getTodosFromDevice = async () => {
-        try {
-            const todos = await AsyncStorage.getItem('todos')
-            if (todos != null) {
-                setTodos(JSON.parse(todos));
-            }
-        } catch (e) {
-            console.log(e)
-        }
-    }
-
-    useEffect(() => {
-        saveTodoToDevice(todos)
-    }, [todos])
-
-    const saveTodoToDevice = async todos => {
-        try {
-            const stringifyTodos = JSON.stringify(todos)
-            await AsyncStorage.setItem('todos', stringifyTodos)
-        } catch (e) {
-            console.log(e)
-        }
-    }
-
-    const addTodo = () => {
+    const onSubmit = () => {
         if (textInput == '') {
             Alert.alert('Error', 'Please input name')
         }
         if (descriptionInput == '') {
             Alert.alert('Error', 'Please input description')
-        }
-        else {
-            const newTodo = {
-                id: Date.now(),
-                task: textInput,
-                description: descriptionInput,
-                completed: false,
-            }
-            setTodos([...todos, newTodo])
+        } else {
+            dispatch(
+                addTodo({
+                    title: textInput,
+                    description: descriptionInput
+                })
+            )
             setTextInput('')
             setDescriptionInput('')
             Alert.alert('Added', 'Todo has been input', [
@@ -75,10 +34,18 @@ export default function TodoAdd({ navigation }) {
             ])
         }
     }
+    const startLoading = () => {
+        setIsLoading(true);
+        setTimeout(() => {
+            setIsLoading(false);
+        }, 2000);
+        setTimeout(() => {
+            onSubmit()
+        }, 2000)
+    };
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
             <View style={styles.container}>
-
                 {isLoading ? (
                     <ActivityIndicator
                         style={{

@@ -1,26 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { Alert, Button, FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { Button, FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+import { useSelector, useDispatch } from 'react-redux'
+import { toggleComplete, deleteTodo } from '../features/todo/todoSlice';
 import COLORS from '../config/COLORS'
 
 
 export default function TodoApp({ navigation }) {
-    const [todos, setTodos] = useState([])
-    useEffect(() => {
-        getTodosFromDevice()
-    }, [])
+    const dispatch = useDispatch()
 
-    useEffect(() => {
-        saveTodoToDevice(todos)
-    }, [todos])
-
-    useFocusEffect(
-        React.useCallback(() => {
-            getTodosFromDevice()
-        }, [])
-    );
+    const todos = useSelector((state) => state.todos)
+    const handleComplete = (todoId) => {
+        dispatch(toggleComplete({
+            id: todoId,
+            completed: true
+        }))
+    }
+    const handleDelete = (todoId) => {
+        dispatch(deleteTodo({ id: todoId }))
+    }
 
     const ListItem = ({ todo }) => {
         return (
@@ -32,12 +30,12 @@ export default function TodoApp({ navigation }) {
                         color: COLORS.primary,
                         textDecorationLine: todo.completed ? 'line-through' : 'none'
                     }}>
-                        {todo.task}
+                        {todo.title}
                     </Text>
                 </View>
                 {
                     !todo.completed && (
-                        <TouchableOpacity style={[styles.actionIcon]} onPress={() => markTodoComplete(todo.id)}>
+                        <TouchableOpacity style={[styles.actionIcon]} onPress={() => handleComplete(todo.id)}>
                             <MaterialIcons name="done" size={20} color={COLORS.white} />
                         </TouchableOpacity>
                     )
@@ -47,57 +45,13 @@ export default function TodoApp({ navigation }) {
                         styles.actionIcon,
                         { backgroundColor: 'red' }
                     ]}
-                    onPress={() => clearTodos(todo.id)}
+                    onPress={() => handleDelete(todo.id)}
                 >
                     <MaterialIcons name="delete" size={20} color={COLORS.white} />
                 </TouchableOpacity>
             </View>
         )
     }
-
-    const getTodosFromDevice = async () => {
-        try {
-            const todos = await AsyncStorage.getItem('todos')
-            if (todos != null) {
-                setTodos(JSON.parse(todos));
-            }
-        } catch (e) {
-            console.log(e)
-        }
-    }
-
-    const saveTodoToDevice = async todos => {
-        try {
-            const stringifyTodos = JSON.stringify(todos)
-            await AsyncStorage.setItem('todos', stringifyTodos)
-        } catch (e) {
-            console.log(e)
-        }
-    }
-
-    const markTodoComplete = (todoId) => {
-        const newTodos = todos.map(item => {
-            if (item.id == todoId) {
-                return { ...item, completed: true }
-            }
-            return item;
-        })
-        setTodos(newTodos)
-    }
-
-    const clearTodos = (todoId) => {
-        const newTodos = todos.filter(item => item.id != todoId);
-        Alert.alert('Confirm', 'Clear todos?', [
-            {
-                text: "Yes",
-                onPress: () => setTodos(newTodos)
-            },
-            {
-                text: "No"
-            }
-        ])
-    }
-
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>

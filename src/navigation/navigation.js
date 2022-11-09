@@ -1,10 +1,8 @@
 import * as React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
 import TodoApp from '../screen/TodoScreen';
 import TodoAdd from '../screen/TodoAdd';
 import AqiScreen from '../screen/AqiScreen';
-
 
 const Stack = createNativeStackNavigator();
 
